@@ -1,0 +1,29 @@
+From 304850c14250973896afaa01650828e1dcd8c45e Mon Sep 17 00:00:00 2001
+From: thenamesweretakenalready
+ <43702423+thenamesweretakenalready@users.noreply.github.com>
+Date: Fri, 1 Sep 2023 19:05:13 +0000
+Subject: [PATCH] Add jit hooks to tm.texi.in
+
+---
+ gcc/doc/tm.texi.in | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/gcc/doc/tm.texi.in b/gcc/doc/tm.texi.in
+index f7ab5d48a63..91824984e09 100644
+--- a/gcc/doc/tm.texi.in
++++ b/gcc/doc/tm.texi.in
+@@ -7984,3 +7984,11 @@ maintainer is familiar with.
+ @hook TARGET_GCOV_TYPE_SIZE
+ 
+ @hook TARGET_HAVE_SHADOW_CALL_STACK
++
++@hook TARGET_JIT_CPU_VERSIONS
++
++@hook TARGET_JIT_REGISTER_CPU_TARGET_INFO
++
++@hook TARGET_JIT_OS_VERSIONS
++
++@hook TARGET_JIT_REGISTER_OS_TARGET_INFO
+-- 
+2.42.0
+

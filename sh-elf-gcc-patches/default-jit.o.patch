@@ -1,0 +1,28 @@
+From 2dd8d8e6c3d4c4ea15dc77994b7168163e365ab2 Mon Sep 17 00:00:00 2001
+From: thenamesweretakenalready
+ <43702423+thenamesweretakenalready@users.noreply.github.com>
+Date: Fri, 1 Sep 2023 21:43:48 +0000
+Subject: [PATCH] Add default-jit.o to Makefile.in
+
+---
+ gcc/Makefile.in | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/gcc/Makefile.in b/gcc/Makefile.in
+index ad9a5d94cd0..66f30f80167 100644
+--- a/gcc/Makefile.in
++++ b/gcc/Makefile.in
+@@ -2323,6 +2323,10 @@ default-d.o: config/default-d.cc
+ 	$(COMPILE) $<
+ 	$(POSTCOMPILE)
+ 
++default-jit.o: config/default-jit.cc
++	$(COMPILE) $<
++	$(POSTCOMPILE)
++
+ # Language-independent files.
+ 
+ DRIVER_DEFINES = \
+-- 
+2.42.0
+
