@@ -1,0 +1,33 @@
+--- a/configure.sh
++++ b/configure.sh
+@@ -96,12 +96,26 @@ else
+   if [[ "$VERSION" = "11.1.0" ]]; then
+     echo "$TAG Applying patches/gcc-11.1.0-libstdc++-v3-skip-dlopen.patch..."
+     patch -u -N -p0 < patches/gcc-11.1.0-libstdc++-v3-skip-dlopen.patch
+-  fi
++    fi
+ 
+   if [[ "$VERSION" = "13.1.0" ]]; then
+     echo "$TAG Applying patches/gcc-13.1.0-rustc-codegen-gcc.patch..."
+     cd gcc-$VERSION
+     patch -t -u -N -p1 < ../patches/gcc-13.1.0-rustc-codegen-gcc.patch
++
++    echo "$TAG Applying patches/target_jit_hooks.patch..."
++    patch -t -u -N -p1 < ../patches/target_jit_hooks.patch
++
++    echo "$TAG Applying patches/default-jit.o.patch..."
++    patch -t -u -N -p1 < ../patches/default-jit.o.patch
++
++    cp ../tm.texi.new gcc/doc/tm.texi
++
++    touch gcc/target.def
++    touch gcc/c-family/c-target.def
++	  touch gcc/common/common-target.def
++	  touch gcc/d/d-target.def
++
+     cd ..
+   fi
+ fi
+diff --git a/giteapc-build.log b/giteapc-build.log
+new file mode 100644
+index 0000000..fc835c8
