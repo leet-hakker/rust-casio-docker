@@ -17,7 +17,14 @@ RUN python3 giteapc.py install Lephenixnoir/GiteaPC -y
 
 # Install the C/C++ SDK and compiler
 RUN giteapc install Lephenixnoir/fxsdk:noudisks2 Lephenixnoir/sh-elf-binutils -y
-RUN giteapc install Lephenixnoir/sh-elf-gcc@rustc-codegen:clean -y
+
+# Bodge to use my patches
+RUN giteapc fetch Lephenixnoir/sh-elf-gcc@rustc-codegen
+WORKDIR /root/.local/share/giteapc/Lephenixnoir/sh-elf-gcc
+COPY 0001-Several-patches-to-make-it-build-again.patch .
+RUN patch -u -N -p1 < 0001-Several-patches-to-make-it-build-again.patch
+RUN giteapc build -i sh-elf-gcc
+
 # Install libm and libc, then go back to the cimpiler for libstdc++
 RUN giteapc install Lephenixnoir/OpenLibm Vhex-Kernel-Core/fxlibc Lephenixnoir/sh-elf-gcc -y
 # Now get gint
