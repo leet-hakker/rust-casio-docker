@@ -21,8 +21,11 @@ RUN giteapc install Lephenixnoir/fxsdk:noudisks2 Lephenixnoir/sh-elf-binutils -y
 # Bodge to use my patches
 RUN giteapc fetch Lephenixnoir/sh-elf-gcc@rustc-codegen
 WORKDIR /root/.local/share/giteapc/Lephenixnoir/sh-elf-gcc
-COPY 0001-Several-patches-to-make-it-build-again.patch .
-RUN patch -u -N -p1 < 0001-Several-patches-to-make-it-build-again.patch
+COPY sh-elf-gcc-patches/default-jit.o.patch patches/
+COPY sh-elf-gcc-patches/target_jit_hooks.patch patches/
+COPY sh-elf-gcc-patches/sh-elf-gcc.patch .
+COPY tm.texi.new .
+RUN patch -u -N -p1 < sh-elf-gcc.patch
 RUN giteapc build -i sh-elf-gcc
 
 # Install libm and libc, then go back to the cimpiler for libstdc++
