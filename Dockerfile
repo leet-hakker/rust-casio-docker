@@ -22,10 +22,8 @@ RUN giteapc install Lephenixnoir/fxsdk:noudisks2 Lephenixnoir/sh-elf-binutils -y
 RUN giteapc fetch Lephenixnoir/sh-elf-gcc@rustc-codegen
 WORKDIR /root/.local/share/giteapc/Lephenixnoir/sh-elf-gcc
 COPY sh-elf-gcc-patches/default-jit.o.patch patches/
-COPY sh-elf-gcc-patches/target_jit_hooks.patch patches/
-COPY sh-elf-gcc-patches/sh-elf-gcc.patch .
-COPY tm.texi.new .
-RUN patch -u -N -p1 < sh-elf-gcc.patch
+COPY sh-elf-gcc-patches/configure.sh.patch .
+RUN patch -t -p1 < configure.sh.patch
 RUN giteapc build -i sh-elf-gcc
 
 # Install libm and libc, then go back to the cimpiler for libstdc++
@@ -46,10 +44,11 @@ RUN git checkout
 
 # Download rustc_codegen_gcc
 WORKDIR /usr/src/
-RUN wget -O rustc_codegen_gcc.zip https://github.com/rust-lang/rustc_codegen_gcc/archive/1bbee3e217d75e7bc3bfe5d8c1b35e776fce96e6.zip
-RUN unzip rustc_codegen_gcc.zip
-RUN rm rustc_codegen_gcc.zip
-RUN mv rustc_codegen_gcc-* rustc_codegen_gcc
+# RUN wget -O rustc_codegen_gcc.zip https://github.com/rust-lang/rustc_codegen_gcc/archive/1bbee3e217d75e7bc3bfe5d8c1b35e776fce96e6.zip
+# RUN unzip rustc_codegen_gcc.zip
+# RUN rm rustc_codegen_gcc.zip
+# RUN mv rustc_codegen_gcc-* rustc_codegen_gcc
+RUN git clone https://github.com/rust-lang/rustc_codegen_gcc.git
 
 # Patch rustc_codegen_gcc
 WORKDIR /usr/src/rustc_codegen_gcc/
@@ -65,8 +64,8 @@ RUN patch -t -p1 < ../use_target_json.patch
 COPY cargo_release_by_default.patch ..
 RUN patch -t -p1 < ../cargo_release_by_default.patch
 
-COPY set_superh_flags.patch ..
-RUN patch -t -p1 < ../set_superh_flags.patch
+COPY leets-Set-SuperH-flags.patch ..
+RUN patch -t -p1 < ../leets-Set-SuperH-flags.patch
 
 COPY ptr_size_fix.patch ..
 RUN patch -t -p1 < ../ptr_size_fix.patch
@@ -80,9 +79,12 @@ RUN chmod +x /usr/local/bin/sh-link-wrap
 
 # Compile rustc_codegen_gcc
 WORKDIR /usr/src/rustc_codegen_gcc/
+
+RUN cargo update
+
 ENV RUST_COMPILER_RT_ROOT="/usr/src/llvm/compiler-rt"
 RUN echo /root/.local/share/fxsdk/sysroot/lib/ > gcc_path
-RUN ./prepare_build.sh
+# RUN ./prepare_build.sh
 RUN LIBRARY_PATH=$(cat gcc_path) LD_LIBRARY_PATH=$(cat gcc_path) PATH=/usr/local/bin/:$PATH:/usr/local/bin/ ./build.sh --release
 
 COPY rustc.sh .

@@ -1,0 +1,89 @@
+From 6c0071ebc1139a0dbc022772a32d7feed9474a36 Mon Sep 17 00:00:00 2001
+From: thenamesweretakenalready
+ <43702423+thenamesweretakenalready@users.noreply.github.com>
+Date: Tue, 5 Sep 2023 14:07:13 +0000
+Subject: [PATCH] Change configure.sh
+
+---
+ configure.sh | 37 ++++++++++++++++---------------------
+ 1 file changed, 16 insertions(+), 21 deletions(-)
+
+diff --git a/configure.sh b/configure.sh
+index 7072b12..3cc16d2 100755
+--- a/configure.sh
++++ b/configure.sh
+@@ -4,8 +4,8 @@ source util.sh
+ 
+ VERSION=$1
+ PREFIX="$2"
+-URL="https://ftp.gnu.org/gnu/gcc/gcc-$VERSION/gcc-$VERSION.tar.xz"
+-ARCHIVE=$(basename "$URL")
++URL="https://github.com/antoyo/gcc/archive/9235afe245489547f79dcc425771dec040a1182a.zip"
++ARCHIVE="antoyo-gcc.zip"
+ 
+ # Final location of gcc in the sysroot
+ SYSROOT_GCC="$SYSROOT/bin/sh-elf-gcc"
+@@ -76,38 +76,33 @@ if [[ -f "$ARCHIVE" ]]; then
+   echo "$TAG Found $ARCHIVE, skipping download"
+ else
+   echo "$TAG Downloading $URL..."
+-  if command -v curl >/dev/null 2>&1; then
+-    curl $URL -o $ARCHIVE
+-  elif command -v wget >/dev/null 2>&1; then
++  if command -v wget >/dev/null 2>&1; then
+     wget -q --show-progress $URL -O $ARCHIVE
+   else
+-    echo "$TAG error: no curl or wget; install one or download archive yourself" >&2
++    echo "$TAG error: no wget; install one or download archive yourself" >&2
+     exit 1
+   fi
+ fi
+ 
+ # Extract archive (OpenBSD-compliant version)
+-if [[ -d "${ARCHIVE%.tar.*}" ]]; then
+-  echo "$TAG Found ${ARCHIVE%.tar.*}, skipping extraction"
++if [[ -d "${ARCHIVE%.zip}" ]]; then
++  echo "$TAG Found ${ARCHIVE%.zip}, skipping extraction"
+ else
+   echo "$TAG Extracting $ARCHIVE..."
+-  unxz -c < $ARCHIVE | tar -xf -
++  # unxz -c < $ARCHIVE | tar -xf -
++  unzip -q $ARCHIVE
++  mv gcc-* gcc-antoyo
+ 
+-  if [[ "$VERSION" = "11.1.0" ]]; then
+-    echo "$TAG Applying patches/gcc-11.1.0-libstdc++-v3-skip-dlopen.patch..."
+-    patch -u -N -p0 < patches/gcc-11.1.0-libstdc++-v3-skip-dlopen.patch
+-  fi
++  cd gcc-antoyo
++  echo "$TAG Applying patches/default-jit.o.patch..."
++  patch -t -u -N -p1 < ../patches/default-jit.o.patch
++
++  cd ..
+ 
+-  if [[ "$VERSION" = "13.1.0" ]]; then
+-    echo "$TAG Applying patches/gcc-13.1.0-rustc-codegen-gcc.patch..."
+-    cd gcc-$VERSION
+-    patch -t -u -N -p1 < ../patches/gcc-13.1.0-rustc-codegen-gcc.patch
+-    cd ..
+-  fi
+ fi
+ 
+ # Download prerequisites
+-cd gcc-$VERSION
++cd gcc-antoyo
+ ./contrib/download_prerequisites
+ cd ..
+ 
+@@ -145,7 +140,7 @@ elif [[ "$SYSROOT_GCC_VERSION" != "$VERSION" ]]; then
+ 
+   cd build
+   run_quietly giteapc-configure.log         \
+-  ../gcc-$VERSION/configure                 \
++  ../gcc-antoyo/configure                 \
+     --prefix="$SYSROOT"                     \
+     --target="sh3eb-elf"                    \
+     --with-multilib-list="m3,m4-nofpu"      \
+-- 
+2.42.0
+

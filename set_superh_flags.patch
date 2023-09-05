@@ -1,57 +1,49 @@
+From a600a1b903e0142c453a111832fd87fccc18c1b0 Mon Sep 17 00:00:00 2001
+From: thenamesweretakenalready
+ <43702423+thenamesweretakenalready@users.noreply.github.com>
+Date: Sat, 2 Sep 2023 13:02:58 +0000
+Subject: [PATCH] Set SuperH flags
+
+---
+ src/base.rs | 16 +++++++++++-----
+ 1 file changed, 11 insertions(+), 5 deletions(-)
+
 diff --git a/src/base.rs b/src/base.rs
-index dcd560b..cff036d 100644
+index 266d60d..099cb4e 100644
 --- a/src/base.rs
 +++ b/src/base.rs
-@@ -92,28 +92,34 @@ pub fn compile_codegen_unit(tcx: TyCtxt<'_>, cgu_name: Symbol, supports_128bit_i
-         context.add_driver_option("-fexceptions");
+@@ -111,7 +111,7 @@ pub fn compile_codegen_unit(tcx: TyCtxt<'_>, cgu_name: Symbol, target_info: Arc<
+         };
  
          // TODO(antoyo): only set on x86 platforms.
 -        context.add_command_line_option("-masm=intel");
 +        // context.add_command_line_option("-masm=intel");
-         // TODO(antoyo): only add the following cli argument if the feature is supported.
--        context.add_command_line_option("-msse2");
--        context.add_command_line_option("-mavx2");
-+        // context.add_command_line_option("-msse2");
-+        // context.add_command_line_option("-mavx2");
-         // FIXME(antoyo): the following causes an illegal instruction on vmovdqu64 in std_example on my CPU.
-         // Only add if the CPU supports it.
--        context.add_command_line_option("-msha");
+ 
+         let features = ["sse2", "avx", "avx2", "sha", "fma", "gfni", "f16c", "aes", "bmi2", "rtm",
+             "vaes", "vpclmulqdq", "xsavec",
+@@ -122,12 +122,18 @@ pub fn compile_codegen_unit(tcx: TyCtxt<'_>, cgu_name: Symbol, target_info: Arc<
+         }
+ 
+         // TODO(antoyo): only add the following cli arguments if the feature is supported.
 -        context.add_command_line_option("-mpclmul");
--        context.add_command_line_option("-mfma");
 -        context.add_command_line_option("-mfma4");
 -        context.add_command_line_option("-m64");
 -        context.add_command_line_option("-mbmi");
--        context.add_command_line_option("-mgfni");
-+        // context.add_command_line_option("-msha");
 +        // context.add_command_line_option("-mpclmul");
-+        // context.add_command_line_option("-mfma");
 +        // context.add_command_line_option("-mfma4");
 +        // context.add_command_line_option("-m64");
 +        // context.add_command_line_option("-mbmi");
-+        // context.add_command_line_option("-mgfni");
          //context.add_command_line_option("-mavxvnni"); // The CI doesn't support this option.
--        context.add_command_line_option("-mf16c");
--        context.add_command_line_option("-maes");
--        context.add_command_line_option("-mxsavec");
--        context.add_command_line_option("-mbmi2");
--        context.add_command_line_option("-mrtm");
--        context.add_command_line_option("-mvaes");
--        context.add_command_line_option("-mvpclmulqdq");
--        context.add_command_line_option("-mavx");
-+        // context.add_command_line_option("-mf16c");
-+        // context.add_command_line_option("-maes");
-+        // context.add_command_line_option("-mxsavec");
-+        // context.add_command_line_option("-mbmi2");
-+        // context.add_command_line_option("-mrtm");
-+        // context.add_command_line_option("-mvaes");
-+        // context.add_command_line_option("-mvpclmulqdq");
-+        // context.add_command_line_option("-mavx");
-+
+ 
 +        context.add_command_line_option("-m4a-nofpu");
 +        context.add_driver_option("-Xassembler");
 +        context.add_driver_option("--isa=sh4a-nofpu");
 +        context.add_command_line_option("-mb");
 +        context.add_command_line_option("-fno-pie");
- 
++
          for arg in &tcx.sess.opts.cg.llvm_args {
              context.add_command_line_option(arg);
+         }
+-- 
+2.42.0
+
